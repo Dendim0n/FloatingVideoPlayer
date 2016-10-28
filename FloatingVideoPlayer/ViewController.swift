@@ -24,6 +24,7 @@ class ViewController: UIViewController {
         let floatingView = FloatingView.sharedInstance
         floatingView.frame = self.view.frame
         window.addSubview(floatingView)
+        floatingView.videoView.setPlayer()
     }
     
     func printSomething() {

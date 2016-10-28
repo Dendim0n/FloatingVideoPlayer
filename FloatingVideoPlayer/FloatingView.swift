@@ -19,12 +19,14 @@ class FloatingView: UIView {
     
     var videoBackView = VideoBackground.init()
     var backgroundView = UIView.init()
-    var videoView = UIView.init()
+    var videoView = PlayerView.init(url: URL.init(string: "http://static.tripbe.com/videofiles/20121214/9533522808.f4v.mp4")!)
     var tableView = UIView.init()
     var panGesture = UIPanGestureRecognizer.init()
     
     var transitionPercentage = 0.0
     var currentState = viewState.fullScreen
+    
+    var displayLink = CADisplayLink()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -43,6 +45,7 @@ class FloatingView: UIView {
         videoView.addPanGesture { (pan) in
             if pan.state == .began {
                 weakSelf?.transitionPercentage = 0
+                displayLink.add(to: RunLoop.current, forMode: RunLoopMode.)
             } else if pan.state == .changed {
                 
                 weakSelf?.transitionPercentage = fabs(Double(pan.translation(in: weakSelf).y)/Double((weakSelf?.tableView.frame.height)!))
@@ -55,13 +58,13 @@ class FloatingView: UIView {
                     if pan.translation(in: weakSelf).y < 0 {
                         weakSelf?.videoView.snp.remakeConstraints { (make) in
                             make.bottom.equalToSuperview()
-                            make.width.equalToSuperview().multipliedBy((weakSelf?.transitionPercentage)!/2+0.5)
+                            make.width.equalToSuperview().multipliedBy(min(1,(weakSelf?.transitionPercentage)!/2+0.5))
                             make.right.equalToSuperview()
-                            make.height.equalToSuperview().multipliedBy((weakSelf?.transitionPercentage)!/2+0.5)
+                            make.height.equalToSuperview().multipliedBy(min(1,(weakSelf?.transitionPercentage)!/2+0.5))
                         }
                         weakSelf?.backgroundView.alpha = CGFloat((weakSelf?.transitionPercentage)!)
                         weakSelf?.tableView.alpha = CGFloat((weakSelf?.transitionPercentage)!)
-                        weakSelf?.frame.origin.y = (weakSelf?.tableView.frame.height)!-abs(pan.translation(in: weakSelf).y)
+                        weakSelf?.frame.origin.y = max(0,(weakSelf?.tableView.frame.height)!-abs(pan.translation(in: weakSelf).y))
                     }
                 case .fullScreen:
                     if pan.translation(in: weakSelf).y > 0 {
@@ -76,6 +79,7 @@ class FloatingView: UIView {
                         weakSelf?.frame.origin.y = pan.translation(in: weakSelf).y
                     }
                 }
+                weakSelf?.videoView.playerLayer.frame = (weakSelf?.videoView.bounds)!
             } else if pan.state == .ended {
                 if (weakSelf?.transitionPercentage)! >= 0.3 {
                     weakSelf?.animateToEnd()
@@ -133,19 +137,18 @@ class FloatingView: UIView {
                 weakSelf?.backgroundView.alpha = 0
                 weakSelf?.tableView.alpha = 0
                 weakSelf?.frame.origin.y = (weakSelf?.tableView.frame.height)!
-//                print((weakSelf?.frame.height)!)
-//                print((weakSelf?.videoBackView.frame.height)!)
                 print((weakSelf?.frame.height)!)
                 weakSelf?.currentState = .floatingWindow
             }
             weakSelf?.layoutIfNeeded()
             }, completion: {
                 Bool in
-//                if (weakSelf?.currentState)! == .floatingWindow {
-//                    UIView.animate(withDuration: 0.3, animations: { 
-//                        weakSelf?.frame.origin.y = 568
-//                    })
-//                }
+                //Need to fix the frame problem!!
+                if (weakSelf?.currentState)! == .floatingWindow {
+                    UIView.animate(withDuration: 0.3, animations: { 
+                        weakSelf?.frame.origin.y = (weakSelf?.tableView.frame.height)!
+                    })
+                }
                 print(weakSelf?.frame.origin.y)
                 print(weakSelf?.tableView.frame.height)
         })
@@ -181,7 +184,14 @@ class FloatingView: UIView {
                 
             }
             weakSelf?.layoutIfNeeded()
-            }, completion: nil)
+            }, completion: {
+                Bool in
+                if (weakSelf?.currentState)! == .floatingWindow {
+                    UIView.animate(withDuration: 0.3, animations: {
+                        weakSelf?.frame.origin.y = (weakSelf?.tableView.frame.height)!
+                    })
+                }
+        })
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
@@ -205,6 +215,8 @@ class VideoBackground:UIView {
             return hitView
         }
     }
+    
+    
 }
 
 extension UIView {

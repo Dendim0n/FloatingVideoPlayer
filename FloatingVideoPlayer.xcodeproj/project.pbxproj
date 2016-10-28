@@ -45,6 +45,7 @@
 		40E181381DC2085900B47E7B /* LayoutConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E181171DC2085900B47E7B /* LayoutConstraint.swift */; };
 		40E181391DC2085900B47E7B /* UILayoutGuide+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E181191DC2085900B47E7B /* UILayoutGuide+Extensions.swift */; };
 		40E1813A1DC2085900B47E7B /* UILayoutSupport+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E1811A1DC2085900B47E7B /* UILayoutSupport+Extensions.swift */; };
+		40E1813C1DC3254200B47E7B /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E1813B1DC3254200B47E7B /* PlayerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -89,6 +90,7 @@
 		40E181181DC2085900B47E7B /* SnapKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SnapKit.h; sourceTree = "<group>"; };
 		40E181191DC2085900B47E7B /* UILayoutGuide+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UILayoutGuide+Extensions.swift"; sourceTree = "<group>"; };
 		40E1811A1DC2085900B47E7B /* UILayoutSupport+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UILayoutSupport+Extensions.swift"; sourceTree = "<group>"; };
+		40E1813B1DC3254200B47E7B /* PlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +126,7 @@
 				40E180E51DC2080D00B47E7B /* AppDelegate.swift */,
 				40E180E71DC2080D00B47E7B /* ViewController.swift */,
 				40E180F71DC2081D00B47E7B /* FloatingView.swift */,
+				40E1813B1DC3254200B47E7B /* PlayerView.swift */,
 				40E180E91DC2080D00B47E7B /* Main.storyboard */,
 				40E180EC1DC2080D00B47E7B /* Assets.xcassets */,
 				40E180EE1DC2080D00B47E7B /* LaunchScreen.storyboard */,
@@ -270,6 +273,7 @@
 				40E181281DC2085900B47E7B /* ConstraintMaker.swift in Sources */,
 				40E181221DC2085900B47E7B /* ConstraintInsetTarget.swift in Sources */,
 				40E181381DC2085900B47E7B /* LayoutConstraint.swift in Sources */,
+				40E1813C1DC3254200B47E7B /* PlayerView.swift in Sources */,
 				40E1812E1DC2085900B47E7B /* ConstraintMultiplierTarget.swift in Sources */,
 				40E181301DC2085900B47E7B /* ConstraintPriorityTarget.swift in Sources */,
 				40E1812C1DC2085900B47E7B /* ConstraintMakerPriortizable.swift in Sources */,
