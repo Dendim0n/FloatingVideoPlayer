@@ -14,6 +14,8 @@ class PlayerView: UIView {
     
     var isPlaying = true
     
+    var playbackTimeObserver:Any?
+    
     lazy var player:AVPlayer = {
         let player = AVPlayer.init(playerItem: self.playerItem)
         return player
@@ -32,6 +34,11 @@ class PlayerView: UIView {
     lazy var progressSlider:UISlider = {
         let slider = UISlider.init()
         return slider
+    }()
+    
+    lazy var progressView:UIProgressView = {
+        let progress = UIProgressView()
+        return progress
     }()
     
     lazy var btnPlay:UIButton = {
@@ -57,28 +64,19 @@ class PlayerView: UIView {
     
     lazy var playerLayer:AVPlayerLayer = {
         let playerLayer = AVPlayerLayer.init(player: self.player)
-//        playerLayer.frame = CGRect.init(x: 0, y: 0, width: 200, height: 100)
         playerLayer.backgroundColor = UIColor.black.cgColor
         playerLayer.videoGravity = AVLayerVideoGravityResizeAspect
         return playerLayer
     }()
-
+    
     init(url:URL) {
         super.init(frame: CGRect.zero)
         playUrl = url
-//        commonInit()
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-//        commonInit()
     }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-//        commonInit()
     }
-    
     
     func setPlayer() {
         
@@ -90,6 +88,7 @@ class PlayerView: UIView {
         addSubview(btnNext)
         addSubview(btnPlay)
         addSubview(btnPrev)
+        addSubview(progressView)
         addSubview(progressSlider)
         btnPlay.snp.makeConstraints { (make) in
             make.center.equalToSuperview()
@@ -114,6 +113,11 @@ class PlayerView: UIView {
             make.left.equalToSuperview()
             make.right.equalToSuperview()
         }
+        progressView.snp.makeConstraints { (make) in
+            make.centerY.equalTo(progressSlider)
+            make.left.equalTo(progressSlider)
+            make.right.equalTo(progressSlider)
+        }
     }
     
     func showControlObjects() {
@@ -122,6 +126,7 @@ class PlayerView: UIView {
             self.btnPrev.alpha = 1
             self.btnNext.alpha = 1
             self.progressSlider.alpha = 1
+            self.progressView.alpha = 1
         }, completion: nil)
     }
     
@@ -131,6 +136,7 @@ class PlayerView: UIView {
             self.btnPrev.alpha = 0
             self.btnNext.alpha = 0
             self.progressSlider.alpha = 0
+            self.progressView.alpha = 0
         }, completion: nil)
     }
     
@@ -139,6 +145,61 @@ class PlayerView: UIView {
         super.layoutSublayers(of: layer)
         playerLayer.frame = self.bounds
     }
+    
+    func monitoringPlayback(_ playerItem:AVPlayerItem) {
+        weak var weakSelf = self
+        playbackTimeObserver = player.addPeriodicTimeObserver(forInterval: CMTime.init(seconds: 1, preferredTimescale: 1), queue: nil, using: {
+            time in
+            let currentSecond = Int(playerItem.currentTime().value)/Int(playerItem.currentTime().timescale)
+            weakSelf!.progressSlider.setValue(Float(currentSecond), animated: true)
+        })
+    }
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        let playerItem = object as! AVPlayerItem
+        if keyPath == "status" {
+            if playerItem.status == .readyToPlay {
+                //                NSLog("AVPlayerStatusReadyToPlay");
+                //                self.stateButton.enabled = YES;
+                let duration = self.playerItem.duration;// 获取视频总长度
+                let totalSecond = Int(playerItem.duration.value) / Int(playerItem.duration.timescale)// 转换成秒
+                //                let totalTime = convertTime(totalSecond)// 转换成播放时间
+                customVideoSlider(duration)// 自定义UISlider外观
+                //                NSLog(@"movie total duration:%f",CMTimeGetSeconds(duration));
+                monitoringPlayback(self.playerItem)// 监听播放状态
+            } else if playerItem.status == .failed {
+                //                NSLog(@"AVPlayerStatusFailed");
+            }
+        } else if keyPath == "loadedTimeRanges" {
+            let timeInterval = availableDuration()// 计算缓冲进度
+            //            NSLog(@"Time Interval:%f",timeInterval);
+            let duration = self.playerItem.duration;
+            let totalDuration = CMTimeGetSeconds(duration)
+            
+            progressView.setProgress(Float(timeInterval)/Float(totalDuration), animated: true)
+        }
+        
+    }
+    
+    func customVideoSlider(_ duration:CMTime) {
+        progressSlider.maximumValue = Float(CMTimeGetSeconds(duration));
+        UIGraphicsBeginImageContextWithOptions(CGSize.init(width: 1, height: 1), false, 0.0)
+        let transparentImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        
+        progressSlider.setMinimumTrackImage(transparentImage, for: .normal)
+        progressSlider.setMaximumTrackImage(transparentImage, for: .normal)
+    }
+    
+    
+    func availableDuration() -> TimeInterval {
+        let loadedTimeRanges = player.currentItem?.loadedTimeRanges
+        let timeRange = loadedTimeRanges?.first?.timeRangeValue// 获取缓冲区域
+        let startSeconds = CMTimeGetSeconds((timeRange?.start)!);
+        let durationSeconds = CMTimeGetSeconds((timeRange?.duration)!);
+        let result = startSeconds + durationSeconds;// 计算缓冲总进度
+        return result;
+    }
+    
     
     func goPlay() {
         if isPlaying {
@@ -155,6 +216,6 @@ class PlayerView: UIView {
         
     }
     func playDidEnd() {
-    
+        
     }
 }
