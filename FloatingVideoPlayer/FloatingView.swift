@@ -21,7 +21,7 @@ class FloatingView: UIView {
     var backgroundView = UIView.init()
     var videoView = PlayerView.init(url: URL.init(string: "http://static.tripbe.com/videofiles/20121214/9533522808.f4v.mp4")!)
     var tableView = UIView.init()
-    var panGesture = UIPanGestureRecognizer.init()
+    var panGesture = BlockPan()
     
     var transitionPercentage = 0.0
     var currentState = viewState.fullScreen
@@ -43,44 +43,15 @@ class FloatingView: UIView {
     func commonInit() {
         weak var weakSelf = self
         videoView.addPanGesture { (pan) in
+            pan.tag = 6666
+            weakSelf?.panGesture = pan
             if pan.state == .began {
+                weakSelf?.videoView.hideControlObjects()
                 weakSelf?.transitionPercentage = 0
-                displayLink.add(to: RunLoop.current, forMode: RunLoopMode.)
-            } else if pan.state == .changed {
-                
-                weakSelf?.transitionPercentage = fabs(Double(pan.translation(in: weakSelf).y)/Double((weakSelf?.tableView.frame.height)!))
-                
-//                weakSelf?.transitionPercentage = (weakSelf?.frame.origin.y)! / self.frame.height
-                
-//                print(weakSelf?.transitionPercentage)
-                switch (weakSelf?.currentState)! {
-                case .floatingWindow:
-                    if pan.translation(in: weakSelf).y < 0 {
-                        weakSelf?.videoView.snp.remakeConstraints { (make) in
-                            make.bottom.equalToSuperview()
-                            make.width.equalToSuperview().multipliedBy(min(1,(weakSelf?.transitionPercentage)!/2+0.5))
-                            make.right.equalToSuperview()
-                            make.height.equalToSuperview().multipliedBy(min(1,(weakSelf?.transitionPercentage)!/2+0.5))
-                        }
-                        weakSelf?.backgroundView.alpha = CGFloat((weakSelf?.transitionPercentage)!)
-                        weakSelf?.tableView.alpha = CGFloat((weakSelf?.transitionPercentage)!)
-                        weakSelf?.frame.origin.y = max(0,(weakSelf?.tableView.frame.height)!-abs(pan.translation(in: weakSelf).y))
-                    }
-                case .fullScreen:
-                    if pan.translation(in: weakSelf).y > 0 {
-                        weakSelf?.videoView.snp.remakeConstraints { (make) in
-                            make.bottom.equalToSuperview()
-                            make.width.equalToSuperview().multipliedBy(1 - (weakSelf?.transitionPercentage)!/2)
-                            make.right.equalToSuperview()
-                            make.height.equalToSuperview().multipliedBy(1 - (weakSelf?.transitionPercentage)!/2)
-                        }
-                        weakSelf?.backgroundView.alpha = 1 - CGFloat((weakSelf?.transitionPercentage)!)
-                        weakSelf?.tableView.alpha = 1 - CGFloat((weakSelf?.transitionPercentage)!)
-                        weakSelf?.frame.origin.y = pan.translation(in: weakSelf).y
-                    }
-                }
-                weakSelf?.videoView.playerLayer.frame = (weakSelf?.videoView.bounds)!
+                weakSelf?.displayLink = CADisplayLink.init(target: self, selector: #selector(weakSelf?.updateViews))
+                weakSelf?.displayLink.add(to: RunLoop.current, forMode: RunLoopMode.commonModes)
             } else if pan.state == .ended {
+                weakSelf?.displayLink.remove(from: RunLoop.current, forMode: RunLoopMode.commonModes)
                 if (weakSelf?.transitionPercentage)! >= 0.3 {
                     weakSelf?.animateToEnd()
                 } else {
@@ -92,7 +63,7 @@ class FloatingView: UIView {
         addSubview(videoBackView)
         videoBackView.addSubview(videoView)
         addSubview(tableView)
-        videoView.backgroundColor = UIColor.yellow
+//        videoView.backgroundColor = UIColor.yellow
         tableView.backgroundColor = UIColor.darkGray
         videoBackView.snp.makeConstraints { (make) in
             make.top.equalToSuperview()
@@ -140,6 +111,7 @@ class FloatingView: UIView {
                 print((weakSelf?.frame.height)!)
                 weakSelf?.currentState = .floatingWindow
             }
+            self.videoView.playerLayer.frame = self.videoView.bounds
             weakSelf?.layoutIfNeeded()
             }, completion: {
                 Bool in
@@ -183,6 +155,7 @@ class FloatingView: UIView {
                 weakSelf?.frame.origin.y = 0
                 
             }
+            self.videoView.playerLayer.frame = self.videoView.bounds
             weakSelf?.layoutIfNeeded()
             }, completion: {
                 Bool in
@@ -192,6 +165,49 @@ class FloatingView: UIView {
                     })
                 }
         })
+    }
+    
+    func updateViews() {
+        
+        transitionPercentage = fabs(Double(panGesture.translation(in: self).y)/Double(tableView.frame.height))
+        
+        //                weakSelf?.transitionPercentage = (weakSelf?.frame.origin.y)! / self.frame.height
+        
+        //                print(weakSelf?.transitionPercentage)
+        switch currentState {
+        case .floatingWindow:
+            if panGesture.translation(in: self).y < 0 {
+                videoView.snp.remakeConstraints { (make) in
+                    make.bottom.equalToSuperview()
+                    make.width.equalToSuperview().multipliedBy(min(1,transitionPercentage/2+0.5))
+                    make.right.equalToSuperview()
+                    make.height.equalToSuperview().multipliedBy(min(1,transitionPercentage/2+0.5))
+                }
+                backgroundView.alpha = CGFloat(transitionPercentage)
+                tableView.alpha = CGFloat(transitionPercentage)
+                frame.origin.y = max(0,tableView.frame.height)-abs(panGesture.translation(in: self).y)
+            }
+        case .fullScreen:
+            if panGesture.translation(in: self).y > 0 {
+                videoView.snp.remakeConstraints { (make) in
+                    make.bottom.equalToSuperview()
+                    make.width.equalToSuperview().multipliedBy(1 - transitionPercentage/2)
+                    make.right.equalToSuperview()
+                    make.height.equalToSuperview().multipliedBy(1 - transitionPercentage/2)
+                }
+                backgroundView.alpha = 1 - CGFloat(transitionPercentage)
+                tableView.alpha = 1 - CGFloat(transitionPercentage)
+                frame.origin.y = panGesture.translation(in: self).y
+            }
+        }
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "status" {
+            
+        } else if keyPath == "loadedTimeRanges" {
+            
+        }
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
@@ -220,7 +236,7 @@ class VideoBackground:UIView {
 }
 
 extension UIView {
-    func addPanGesture(action: ((UIPanGestureRecognizer) -> ())?) {
+    func addPanGesture(action: ((BlockPan) -> ())?) {
         let pan = BlockPan(action: action)
         addGestureRecognizer(pan)
         isUserInteractionEnabled = true
@@ -228,19 +244,22 @@ extension UIView {
 }
 
 class BlockPan: UIPanGestureRecognizer {
-    private var panAction: ((UIPanGestureRecognizer) -> Void)?
+    
+    var tag = 0
+    
+    private var panAction: ((BlockPan) -> Void)?
     
     public override init(target: Any?, action: Selector?) {
         super.init(target: target, action: action)
     }
     
-    public convenience init (action: ((UIPanGestureRecognizer) -> Void)?) {
+    public convenience init (action: ((BlockPan) -> Void)?) {
         self.init()
         self.panAction = action
         self.addTarget(self, action: #selector(BlockPan.didPan(_:)))
     }
     
-    open func didPan (_ pan: UIPanGestureRecognizer) {
+    open func didPan (_ pan: BlockPan) {
         panAction? (pan)
     }
 }
