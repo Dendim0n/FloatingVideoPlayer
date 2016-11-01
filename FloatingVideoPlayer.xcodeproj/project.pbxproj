@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		401495341DC7170700A2402E /* PlayButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 401495331DC7170700A2402E /* PlayButton.swift */; };
+		401495341DC7170700A2402E /* PlayerControlPanelButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 401495331DC7170700A2402E /* PlayerControlPanelButton.swift */; };
 		40E180E61DC2080D00B47E7B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E180E51DC2080D00B47E7B /* AppDelegate.swift */; };
 		40E180E81DC2080D00B47E7B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E180E71DC2080D00B47E7B /* ViewController.swift */; };
 		40E180EB1DC2080D00B47E7B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 40E180E91DC2080D00B47E7B /* Main.storyboard */; };
@@ -50,7 +50,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		401495331DC7170700A2402E /* PlayButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayButton.swift; sourceTree = "<group>"; };
+		401495331DC7170700A2402E /* PlayerControlPanelButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerControlPanelButton.swift; sourceTree = "<group>"; };
 		40E180E21DC2080D00B47E7B /* FloatingVideoPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FloatingVideoPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		40E180E51DC2080D00B47E7B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		40E180E71DC2080D00B47E7B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -129,7 +129,7 @@
 				40E180E71DC2080D00B47E7B /* ViewController.swift */,
 				40E180F71DC2081D00B47E7B /* FloatingView.swift */,
 				40E1813B1DC3254200B47E7B /* PlayerView.swift */,
-				401495331DC7170700A2402E /* PlayButton.swift */,
+				401495331DC7170700A2402E /* PlayerControlPanelButton.swift */,
 				40E180E91DC2080D00B47E7B /* Main.storyboard */,
 				40E180EC1DC2080D00B47E7B /* Assets.xcassets */,
 				40E180EE1DC2080D00B47E7B /* LaunchScreen.storyboard */,
@@ -282,7 +282,7 @@
 				40E1812C1DC2085900B47E7B /* ConstraintMakerPriortizable.swift in Sources */,
 				40E181361DC2085900B47E7B /* Debugging.swift in Sources */,
 				40E181211DC2085900B47E7B /* ConstraintInsets.swift in Sources */,
-				401495341DC7170700A2402E /* PlayButton.swift in Sources */,
+				401495341DC7170700A2402E /* PlayerControlPanelButton.swift in Sources */,
 				40E181251DC2085900B47E7B /* ConstraintLayoutGuideDSL.swift in Sources */,
 				40E181271DC2085900B47E7B /* ConstraintLayoutSupportDSL.swift in Sources */,
 				40E1811F1DC2085900B47E7B /* ConstraintDescription.swift in Sources */,

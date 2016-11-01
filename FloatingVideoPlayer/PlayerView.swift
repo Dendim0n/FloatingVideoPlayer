@@ -12,6 +12,8 @@ import AVFoundation
 
 class PlayerView: UIView {
     
+    var panelVisible = true
+    
     var isPlaying = true
     
     var playbackTimeObserver:Any?
@@ -41,23 +43,23 @@ class PlayerView: UIView {
         return progress
     }()
     
-    lazy var btnPlay:UIButton = {
-        let button = UIButton.init()
-        button.backgroundColor = .yellow
+    lazy var btnPlay:PlayerControlPanelButton = {
+        let button = PlayerControlPanelButton.init()
+        button.backgroundColor = .clear
         button.addTarget(self, action: #selector(goPlay), for: UIControlEvents.touchUpInside)
         return button
     }()
     
-    lazy var btnPrev:UIButton = {
-        let button = UIButton.init()
-        button.backgroundColor = .white
+    lazy var btnPrev:PlayerControlPanelButton = {
+        let button = PlayerControlPanelButton.init()
+        button.backgroundColor = .clear
         button.addTarget(self, action: #selector(goPrev), for: UIControlEvents.touchUpInside)
         return button
     }()
     
-    lazy var btnNext:UIButton = {
-        let button = UIButton.init()
-        button.backgroundColor = .purple
+    lazy var btnNext:PlayerControlPanelButton = {
+        let button = PlayerControlPanelButton.init()
+        button.backgroundColor = .clear
         button.addTarget(self, action: #selector(goNext), for: UIControlEvents.touchUpInside)
         return button
     }()
@@ -127,7 +129,22 @@ class PlayerView: UIView {
             self.btnNext.alpha = 1
             self.progressSlider.alpha = 1
             self.progressView.alpha = 1
-        }, completion: nil)
+        }, completion: {
+            Bool in
+            self.panelVisible = true
+        })
+        
+        
+//        UIView.animate(withDuration: 0.3, delay: 2, options: UIViewAnimationOptions.curveEaseInOut, animations: {
+//            self.btnPlay.alpha = 0
+//            self.btnPrev.alpha = 0
+//            self.btnNext.alpha = 0
+//            self.progressSlider.alpha = 0
+//            self.progressView.alpha = 0
+//        }, completion: {
+//            Bool in
+//            self.panelVisible = false
+//        })
     }
     
     func hideControlObjects() {
@@ -137,13 +154,19 @@ class PlayerView: UIView {
             self.btnNext.alpha = 0
             self.progressSlider.alpha = 0
             self.progressView.alpha = 0
-        }, completion: nil)
+        }, completion: {
+            Bool in
+            self.panelVisible = false
+        })
     }
     
     
     override func layoutSublayers(of layer: CALayer) {
         super.layoutSublayers(of: layer)
         playerLayer.frame = self.bounds
+        btnPlay.initPlayButton()
+        btnPrev.initPrevButton()
+        btnNext.initNextButton()
     }
     
     func monitoringPlayback(_ playerItem:AVPlayerItem) {
@@ -204,8 +227,10 @@ class PlayerView: UIView {
     func goPlay() {
         if isPlaying {
             player.pause()
+            btnPlay.setToPlay()
         } else {
             player.play()
+            btnPlay.setToPause()
         }
         isPlaying = !isPlaying
     }

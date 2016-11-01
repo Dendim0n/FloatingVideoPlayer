@@ -59,6 +59,30 @@ class FloatingView: UIView {
                 }
             }
         }
+        videoView.addTapGesture { (tap) in
+            if weakSelf?.currentState == .floatingWindow {
+                UIView.animate(withDuration: 0.5, delay: 0, options: UIViewAnimationOptions.curveEaseInOut, animations: { 
+                    weakSelf?.videoView.snp.remakeConstraints { (make) in
+                        make.bottom.equalToSuperview()
+                        make.width.equalToSuperview()
+                        make.right.equalToSuperview()
+                        make.height.equalToSuperview()
+                    }
+                    weakSelf?.backgroundView.alpha = 1
+                    weakSelf?.tableView.alpha = 1
+                    weakSelf?.frame.origin.y = 0
+                    weakSelf?.currentState = .fullScreen
+                    weakSelf?.layoutIfNeeded()
+                }, completion: nil)
+            } else {
+                if (weakSelf?.videoView.panelVisible)! {
+                    weakSelf?.videoView.hideControlObjects()
+                } else {
+                    weakSelf?.videoView.showControlObjects()
+                }
+//                weakSelf?.videoView.panelVisible = !(weakSelf?.videoView.panelVisible)!
+            }
+        }
         backgroundView.backgroundColor = UIColor.black
         addSubview(videoBackView)
         videoBackView.addSubview(videoView)
@@ -241,6 +265,11 @@ extension UIView {
         addGestureRecognizer(pan)
         isUserInteractionEnabled = true
     }
+    func addTapGesture(tapNumber: Int = 1, action: ((BlockTap) -> ())?) {
+        let tap = BlockTap(tapCount: tapNumber, fingerCount: 1, action: action)
+        addGestureRecognizer(tap)
+        isUserInteractionEnabled = true
+    }
 }
 
 class BlockPan: UIPanGestureRecognizer {
@@ -261,5 +290,33 @@ class BlockPan: UIPanGestureRecognizer {
     
     open func didPan (_ pan: BlockPan) {
         panAction? (pan)
+    }
+}
+class BlockTap: UITapGestureRecognizer {
+    private var tapAction: ((BlockTap) -> Void)?
+    
+    public override init(target: Any?, action: Selector?) {
+        super.init(target: target, action: action)
+    }
+    
+    public convenience init (
+        tapCount: Int = 1,
+        fingerCount: Int = 1,
+        action: ((BlockTap) -> Void)?) {
+        self.init()
+        self.numberOfTapsRequired = tapCount
+        
+        #if os(iOS)
+            
+            self.numberOfTouchesRequired = fingerCount
+            
+        #endif
+        
+        self.tapAction = action
+        self.addTarget(self, action: #selector(BlockTap.didTap(_:)))
+    }
+    
+    open func didTap (_ tap: BlockTap) {
+        tapAction? (tap)
     }
 }
