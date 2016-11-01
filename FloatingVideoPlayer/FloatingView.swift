@@ -12,11 +12,17 @@ class FloatingView: UIView {
     
     static let sharedInstance = FloatingView()
     
+    enum swipeDirection {
+        case horizontal
+        case vertical
+        case none
+    }
+    
     enum viewState {
         case fullScreen
         case floatingWindow
     }
-    
+    var direction = swipeDirection.none
     var videoBackView = VideoBackground.init()
     var backgroundView = UIView.init()
     var videoView = PlayerView.init(url: URL.init(string: "http://static.tripbe.com/videofiles/20121214/9533522808.f4v.mp4")!)
@@ -191,6 +197,32 @@ class FloatingView: UIView {
         })
     }
     
+    func determineSwipeDirection(translation:CGPoint) ->
+        swipeDirection {
+            let gestureMinimumTranslation = 20.0
+            
+//            if swipeDirection != .none {
+//                return swipeDirection
+//            }
+            if (fabs(translation.x) > CGFloat(gestureMinimumTranslation)) {
+                
+                var gestureHorizontal = false
+                
+                if translation.y == 0.0 {
+                    gestureHorizontal = true
+                } else {
+                    gestureHorizontal = (fabs(translation.x / translation.y) > 5.0)
+                }
+                
+                if gestureHorizontal {
+                    return .horizontal
+                }
+            } else if (fabs(translation.y) > CGFloat(gestureMinimumTranslation)) {
+                return .vertical
+            }
+            return swipeDirection
+    }
+    
     func updateViews() {
         
         transitionPercentage = fabs(Double(panGesture.translation(in: self).y)/Double(tableView.frame.height))
@@ -305,13 +337,7 @@ class BlockTap: UITapGestureRecognizer {
         action: ((BlockTap) -> Void)?) {
         self.init()
         self.numberOfTapsRequired = tapCount
-        
-        #if os(iOS)
-            
-            self.numberOfTouchesRequired = fingerCount
-            
-        #endif
-        
+        self.numberOfTouchesRequired = fingerCount
         self.tapAction = action
         self.addTarget(self, action: #selector(BlockTap.didTap(_:)))
     }
