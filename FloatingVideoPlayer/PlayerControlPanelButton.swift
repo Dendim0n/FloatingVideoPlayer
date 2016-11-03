@@ -15,45 +15,45 @@ class PlayerControlPanelButton: UIButton {
     let triangle = CAShapeLayer()
     let rightPauseLine = CAShapeLayer()
     
-    let duration = 0.6
-    let delay = 0.2
+    let duration = 0.6 * 2
+    let subDuration = 0.2 * 2
     
     
     func setToPlay() {
-        UIView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: 0.3, initialSpringVelocity: 5, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
+        UIView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: 0.1, initialSpringVelocity: 0, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
             self.circle.strokeStart = 0
             self.circle.strokeEnd = 0
          }, completion: {
             Bool in
             
         })
-        UIView.animate(withDuration: delay, delay: 0, usingSpringWithDamping: 0.3, initialSpringVelocity: 5, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
+        UIView.animate(withDuration: subDuration, delay: 0, usingSpringWithDamping: 0.1, initialSpringVelocity: 0, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
             self.rightPauseLine.strokeStart = 0
             self.rightPauseLine.strokeEnd = 0.52
         }, completion: {
             Bool in
-            
+            UIView.animate(withDuration: self.subDuration, delay: 0, usingSpringWithDamping: 0.1, initialSpringVelocity: 0, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
+                //            self.rightPauseLine.strokeStart = 0
+                self.rightPauseLine.strokeEnd = 0
+                self.triangle.strokeStart = 0.3
+            }, completion: {
+                Bool in
+                UIView.animate(withDuration: self.subDuration, delay: 0, usingSpringWithDamping: 0.1, initialSpringVelocity: 0, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
+                    //            self.rightPauseLine.strokeStart = 0
+                    self.rightPauseLine.strokeEnd = 0
+                    self.triangle.strokeStart = 0
+                }, completion: {
+                    Bool in
+                    
+                })
+            })
         })
-        UIView.animate(withDuration: delay, delay: delay, usingSpringWithDamping: 0.3, initialSpringVelocity: 5, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
-//            self.rightPauseLine.strokeStart = 0
-            self.rightPauseLine.strokeEnd = 0
-            self.triangle.strokeStart = 0.3
-        }, completion: {
-            Bool in
-            
-        })
-        UIView.animate(withDuration: delay, delay: delay*2.0, usingSpringWithDamping: 0.3, initialSpringVelocity: 5, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
-            //            self.rightPauseLine.strokeStart = 0
-            self.rightPauseLine.strokeEnd = 0
-            self.triangle.strokeStart = 0
-        }, completion: {
-            Bool in
-            
-        })
+        
+        
     }
     
     func setToPause() {
-        UIView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: 0.3, initialSpringVelocity: 5, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
+        UIView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: 0.1, initialSpringVelocity: 0, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
             self.circle.strokeStart = 0
             self.circle.strokeEnd = 1
             
@@ -61,32 +61,32 @@ class PlayerControlPanelButton: UIButton {
             Bool in
             
         })
-        UIView.animate(withDuration: delay, delay: 0, usingSpringWithDamping: 0.3, initialSpringVelocity: 5, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
+        UIView.animate(withDuration: subDuration, delay: 0, usingSpringWithDamping: 0.1, initialSpringVelocity: 0, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
             self.triangle.strokeStart = 0.3 //0.65
             
             self.rightPauseLine.strokeStart = 0 //0.52
             self.rightPauseLine.strokeEnd = 0 //1
         }, completion: {
             Bool in
-            
+            UIView.animate(withDuration: self.subDuration, delay: 0, usingSpringWithDamping: 0.1, initialSpringVelocity: 0, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
+                self.triangle.strokeStart = 0.65
+                
+                self.rightPauseLine.strokeStart = 0 //0.52
+                self.rightPauseLine.strokeEnd = 0.3 //1
+            }, completion: {
+                Bool in
+                UIView.animate(withDuration: self.subDuration, delay: 0, usingSpringWithDamping: 0.1, initialSpringVelocity: 0, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
+                    
+                    self.rightPauseLine.strokeStart = 0.52
+                    self.rightPauseLine.strokeEnd = 1
+                }, completion: {
+                    Bool in
+                    
+                })
+            })
         })
-        UIView.animate(withDuration: delay, delay: delay, usingSpringWithDamping: 0.3, initialSpringVelocity: 5, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
-            self.triangle.strokeStart = 0.65
-            
-            self.rightPauseLine.strokeStart = 0 //0.52
-            self.rightPauseLine.strokeEnd = 0.3 //1
-        }, completion: {
-            Bool in
-            
-        })
-        UIView.animate(withDuration: delay, delay: delay*2.0, usingSpringWithDamping: 0.3, initialSpringVelocity: 5, options: UIViewAnimationOptions.allowAnimatedContent, animations: {
-            
-            self.rightPauseLine.strokeStart = 0.52
-            self.rightPauseLine.strokeEnd = 1
-        }, completion: {
-            Bool in
-            
-        })
+        
+        
     }
     
     func initPlayButton() {

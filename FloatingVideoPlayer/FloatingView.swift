@@ -67,7 +67,7 @@ class FloatingView: UIView {
         }
         videoView.addTapGesture { (tap) in
             if weakSelf?.currentState == .floatingWindow {
-                UIView.animate(withDuration: 0.5, delay: 0, options: UIViewAnimationOptions.curveEaseInOut, animations: { 
+                UIView.animate(withDuration: 0.5, delay: 0, options: UIViewAnimationOptions.curveEaseInOut, animations: {
                     weakSelf?.videoView.snp.remakeConstraints { (make) in
                         make.bottom.equalToSuperview()
                         make.width.equalToSuperview()
@@ -86,14 +86,14 @@ class FloatingView: UIView {
                 } else {
                     weakSelf?.videoView.showControlObjects()
                 }
-//                weakSelf?.videoView.panelVisible = !(weakSelf?.videoView.panelVisible)!
+                //                weakSelf?.videoView.panelVisible = !(weakSelf?.videoView.panelVisible)!
             }
         }
         backgroundView.backgroundColor = UIColor.black
         addSubview(videoBackView)
         videoBackView.addSubview(videoView)
         addSubview(tableView)
-//        videoView.backgroundColor = UIColor.yellow
+        //        videoView.backgroundColor = UIColor.yellow
         tableView.backgroundColor = UIColor.darkGray
         videoBackView.snp.makeConstraints { (make) in
             make.top.equalToSuperview()
@@ -127,7 +127,7 @@ class FloatingView: UIView {
                 weakSelf?.backgroundView.alpha = 1
                 weakSelf?.tableView.alpha = 1
                 weakSelf?.frame.origin.y = 0
-                weakSelf?.currentState = .fullScreen
+                weakSelf?.currentState = .fullScreen 
             case .fullScreen:
                 weakSelf?.videoView.snp.remakeConstraints { (make) in
                     make.bottom.equalToSuperview()
@@ -138,21 +138,21 @@ class FloatingView: UIView {
                 weakSelf?.backgroundView.alpha = 0
                 weakSelf?.tableView.alpha = 0
                 weakSelf?.frame.origin.y = (weakSelf?.tableView.frame.height)!
-                print((weakSelf?.frame.height)!)
+//                print((weakSelf?.frame.height)!)
                 weakSelf?.currentState = .floatingWindow
             }
             self.videoView.playerLayer.frame = self.videoView.bounds
             weakSelf?.layoutIfNeeded()
-            }, completion: {
-                Bool in
-                //Need to fix the frame problem!!
-                if (weakSelf?.currentState)! == .floatingWindow {
-                    UIView.animate(withDuration: 0.3, animations: { 
-                        weakSelf?.frame.origin.y = (weakSelf?.tableView.frame.height)!
-                    })
-                }
-                print(weakSelf?.frame.origin.y)
-                print(weakSelf?.tableView.frame.height)
+        }, completion: {
+            Bool in
+            //Need to fix the frame problem!!
+            if (weakSelf?.currentState)! == .floatingWindow {
+                UIView.animate(withDuration: 0.3, animations: {
+                    weakSelf?.frame.origin.y = (weakSelf?.tableView.frame.height)!
+                })
+            }
+//            print(weakSelf?.frame.origin.y)
+//            print(weakSelf?.tableView.frame.height)
         })
     }
     func animateToStart() {
@@ -187,13 +187,13 @@ class FloatingView: UIView {
             }
             self.videoView.playerLayer.frame = self.videoView.bounds
             weakSelf?.layoutIfNeeded()
-            }, completion: {
-                Bool in
-                if (weakSelf?.currentState)! == .floatingWindow {
-                    UIView.animate(withDuration: 0.3, animations: {
-                        weakSelf?.frame.origin.y = (weakSelf?.tableView.frame.height)!
-                    })
-                }
+        }, completion: {
+            Bool in
+            if (weakSelf?.currentState)! == .floatingWindow {
+                UIView.animate(withDuration: 0.3, animations: {
+                    weakSelf?.frame.origin.y = (weakSelf?.tableView.frame.height)!
+                })
+            }
         })
     }
     
@@ -201,9 +201,9 @@ class FloatingView: UIView {
         swipeDirection {
             let gestureMinimumTranslation = 20.0
             
-//            if swipeDirection != .none {
-//                return swipeDirection
-//            }
+            //            if swipeDirection != .none {
+            //                return swipeDirection
+            //            }
             if (fabs(translation.x) > CGFloat(gestureMinimumTranslation)) {
                 
                 var gestureHorizontal = false
@@ -220,10 +220,12 @@ class FloatingView: UIView {
             } else if (fabs(translation.y) > CGFloat(gestureMinimumTranslation)) {
                 return .vertical
             }
-            return swipeDirection
+            return .none
     }
     
     func updateViews() {
+        
+        direction = determineSwipeDirection(translation: panGesture.translation(in: videoView))
         
         transitionPercentage = fabs(Double(panGesture.translation(in: self).y)/Double(tableView.frame.height))
         
@@ -232,17 +234,30 @@ class FloatingView: UIView {
         //                print(weakSelf?.transitionPercentage)
         switch currentState {
         case .floatingWindow:
-            if panGesture.translation(in: self).y < 0 {
-                videoView.snp.remakeConstraints { (make) in
-                    make.bottom.equalToSuperview()
-                    make.width.equalToSuperview().multipliedBy(min(1,transitionPercentage/2+0.5))
-                    make.right.equalToSuperview()
-                    make.height.equalToSuperview().multipliedBy(min(1,transitionPercentage/2+0.5))
+            switch direction {
+            case .horizontal:
+                if panGesture.translation(in: self).x < 0 {
+                    //here should add removing anim&func and do further anim like animToStart&End
+                                    
                 }
-                backgroundView.alpha = CGFloat(transitionPercentage)
-                tableView.alpha = CGFloat(transitionPercentage)
-                frame.origin.y = max(0,tableView.frame.height)-abs(panGesture.translation(in: self).y)
+                break
+            case .vertical:
+                if panGesture.translation(in: self).y < 0 {
+                    videoView.snp.remakeConstraints { (make) in
+                        make.bottom.equalToSuperview()
+                        make.width.equalToSuperview().multipliedBy(min(1,transitionPercentage/2+0.5))
+                        make.right.equalToSuperview()
+                        make.height.equalToSuperview().multipliedBy(min(1,transitionPercentage/2+0.5))
+                    }
+                    backgroundView.alpha = CGFloat(transitionPercentage)
+                    tableView.alpha = CGFloat(transitionPercentage)
+                    frame.origin.y = max(0,tableView.frame.height)-abs(panGesture.translation(in: self).y)
+                }
+                break
+            default:
+                break
             }
+            
         case .fullScreen:
             if panGesture.translation(in: self).y > 0 {
                 videoView.snp.remakeConstraints { (make) in
@@ -267,7 +282,7 @@ class FloatingView: UIView {
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-//        print("hit test MainBackground")
+        //        print("hit test MainBackground")
         let hitView = super.hitTest(point, with: event)
         if hitView == self {
             return nil
@@ -279,7 +294,7 @@ class FloatingView: UIView {
 
 class VideoBackground:UIView {
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-//        print("hit test VideoBackground")
+        //        print("hit test VideoBackground")
         let hitView = super.hitTest(point, with: event)
         if hitView == self {
             return nil

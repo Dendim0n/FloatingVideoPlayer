@@ -35,6 +35,8 @@ class PlayerView: UIView {
     
     lazy var progressSlider:UISlider = {
         let slider = UISlider.init()
+        slider.addTarget(self, action: #selector(sliderChangedValue), for: UIControlEvents.valueChanged)
+        
         return slider
     }()
     
@@ -84,6 +86,7 @@ class PlayerView: UIView {
         
         layer.addSublayer(playerLayer)
         progressSlider.value = 0
+//        progressSlider.add
         player.volume = 0.1
         player.play()
         
@@ -157,6 +160,21 @@ class PlayerView: UIView {
         }, completion: {
             Bool in
             self.panelVisible = false
+        })
+    }
+    
+    
+//    @objc(sliderChangedValue:)
+    func sliderChangedValue(slider:UISlider) {
+        print(slider.value)
+        let changedTime = CMTime.init(seconds: Double(slider.value), preferredTimescale: 1)
+        player.pause()
+        weak var weakSelf = self
+        player.seek(to: changedTime, completionHandler: {
+            Bool in
+            weakSelf?.player.play()
+//            weakSelf?.progressSlider.setValue(0.0, animated: true)
+//            weakSelf?.btnPlay.setToPlay()
         })
     }
     
@@ -241,6 +259,25 @@ class PlayerView: UIView {
         
     }
     func playDidEnd() {
+        weak var weakSelf = self
+        player.seek(to: kCMTimeZero, completionHandler: {
+            Bool in
+            weakSelf?.progressSlider.setValue(0.0, animated: true)
+            weakSelf?.btnPlay.setToPlay()
+            self.showControlObjects()
+        })
+    }
+    func playUrl(url:URL) {
+        
+        NotificationCenter.default.removeObserver(self)
+        player.pause()
+        
+        let playerItem:AVPlayerItem = AVPlayerItem.init(url: self.playUrl)
+        playerItem.addObserver(self, forKeyPath: "status", options: NSKeyValueObservingOptions.new, context: nil)
+        playerItem.addObserver(self, forKeyPath: "loadedTimeRanges", options: NSKeyValueObservingOptions.new, context: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(playDidEnd), name:NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: playerItem)
+        
+        player.replaceCurrentItem(with: playerItem)
         
     }
 }
