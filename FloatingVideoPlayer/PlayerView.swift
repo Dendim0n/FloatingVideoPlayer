@@ -31,7 +31,7 @@ class PlayerView: UIView {
         return playerItem
     }()
     
-    var playUrl:URL = URL.init(string: "http://static.tripbe.com/videofiles/20121214/9533522808.f4v.mp4")!
+    var playUrl:URL = URL.init(string: "http://123.134.67.201:80/play/BEDF14F6FF4FF604DCCB053EEE20536EB33EFC37.mp4")!
     
     lazy var progressSlider:UISlider = {
         let slider = UISlider.init()
@@ -269,15 +269,16 @@ class PlayerView: UIView {
     }
     func playUrl(url:URL) {
         
-        NotificationCenter.default.removeObserver(self)
         player.pause()
+        NotificationCenter.default.removeObserver(self)
+        
         
         let playerItem:AVPlayerItem = AVPlayerItem.init(url: self.playUrl)
+        player.replaceCurrentItem(with: playerItem)
+        
         playerItem.addObserver(self, forKeyPath: "status", options: NSKeyValueObservingOptions.new, context: nil)
         playerItem.addObserver(self, forKeyPath: "loadedTimeRanges", options: NSKeyValueObservingOptions.new, context: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(playDidEnd), name:NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: playerItem)
-        
-        player.replaceCurrentItem(with: playerItem)
         
     }
 }

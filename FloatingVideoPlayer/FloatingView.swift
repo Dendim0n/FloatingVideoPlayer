@@ -25,7 +25,7 @@ class FloatingView: UIView {
     var direction = swipeDirection.none
     var videoBackView = VideoBackground.init()
     var backgroundView = UIView.init()
-    var videoView = PlayerView.init(url: URL.init(string: "http://static.tripbe.com/videofiles/20121214/9533522808.f4v.mp4")!)
+    var videoView = PlayerView.init(url: URL.init(string: "http://123.134.67.201:80/play/BEDF14F6FF4FF604DCCB053EEE20536EB33EFC37.mp4")!)
     var tableView = UIView.init()
     var panGesture = BlockPan()
     
